@@ -14,15 +14,15 @@ public interface PostService {
 	void deletePost(Integer postId);
 	
 	//Get all posts
-	List<Post> getAllPost();
+	List<PostDto> getAllPost();
 	
-	Post getPostById(Integer postId);
+	PostDto getPostById(Integer postId);
 	
 	//get all post by category
-	List<Post> getPostsByCategory(Integer userId);
+	List<PostDto> getPostsByCategory(Integer categoryId);
 	
 	//get all post by user
-	List<Post> getPostsByUser(Integer userId);
+	List<PostDto> getPostsByUser(Integer userId);
 	
 	// search post
 	List<Post> searchPosts(String keyword);
