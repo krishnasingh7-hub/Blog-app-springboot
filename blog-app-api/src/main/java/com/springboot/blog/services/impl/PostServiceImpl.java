@@ -5,16 +5,20 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.springboot.blog.entities.Category;
 import com.springboot.blog.entities.Post;
 import com.springboot.blog.entities.User;
 import com.springboot.blog.exceptions.ResourceNotFoundException;
 import com.springboot.blog.payloads.PostDto;
+import com.springboot.blog.payloads.PostResponse;
 import com.springboot.blog.repositories.CategoryRepo;
 import com.springboot.blog.repositories.PostRepo;
 import com.springboot.blog.repositories.UserRepo;
@@ -44,7 +48,7 @@ public class PostServiceImpl implements PostService {
 		
 		Post post = this.modelMapper.map(postDto, Post.class);
 		post.setImageName("default.png");
-		post.setAddedDate(new Date());
+		post.setAddedDate(new Date()); 
 		post.setCategory(category);
 		post.setUser(user);
 		
@@ -73,18 +77,37 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<PostDto> getAllPost() {
+	public PostResponse getAllPost(Integer pageNumber,Integer pageSize,String sortBy) {
 		// TODO Auto-generated method stub
-		List<Post> allPosts= this.postRepo.findAll();
+		// of creating object and by() also create object
+		Pageable p=PageRequest.of(pageNumber, pageSize,Sort.by(sortBy).descending());
+		
+		Page<Post> pagePost=this.postRepo.findAll(p);
+		
+		List<Post> allPosts= pagePost.getContent();
+		
 		List<PostDto> postDtos= allPosts.stream().map((post)->this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
-		return postDtos;
+		
+		PostResponse postResponse=new PostResponse();
+		
+		postResponse.setContent(postDtos);
+		
+		postResponse.setPageNumber(pagePost.getNumber());
+		
+		postResponse.setPageSize(pagePost.getSize());
+		
+		postResponse.setTotalElements(pagePost.getTotalElements());
+		
+		postResponse.setTotalPages(pagePost.getTotalPages());
+		
+		return postResponse;
 	}
 
 	@Override
 	public PostDto getPostById(Integer postId) {
 		// TODO Auto-generated method stub
 		Post post= this.postRepo.findById(postId).orElseThrow(()-> new ResourceNotFoundException("post", "post Id", postId));
-		
+		 
 		return this.modelMapper.map(post, PostDto.class);
 	}
 

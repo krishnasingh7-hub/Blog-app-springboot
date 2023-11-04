@@ -37,7 +37,7 @@ public class Post {
 	
 	@ManyToOne
 	@JoinColumn(name = "category_id")
-	private Category category;
+	private Category category; 
 	
 	@ManyToOne
 	private User user;
