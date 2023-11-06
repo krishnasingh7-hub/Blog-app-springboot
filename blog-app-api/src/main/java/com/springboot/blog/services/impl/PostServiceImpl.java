@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,9 +131,11 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public List<Post> searchPosts(String keyword) {
+	public List<PostDto> searchPosts(String keyword) {
 		// TODO Auto-generated method stub
-		return null;
+		List<Post> posts= this.postRepo.findByTitleContaining(keyword);
+		List<PostDto> postDtos= posts.stream().map((post)-> this.modelMapper.map(post,PostDto.class)).collect(Collectors.toList());
+		return postDtos;
 	}
 
 }
